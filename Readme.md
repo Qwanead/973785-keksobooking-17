@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Антон Рассадников](https://up.htmlacademy.ru/javascript/17/user/973785).
-* Наставник: `Неизвестно`.
+* Наставник: [Артем Черкасов](https://up.htmlacademy.ru/javascript/17/user/530727).
 
 ---
 
