@@ -9,11 +9,12 @@ var createOffer = function (num) {
   ];
 
   var offer = {};
+  var mapWidth = document.querySelector('main').offsetWidth;
 
   offer.author = {avatar: 'img/avatars/user0' + num + '.png'};
   offer.offer = {type: OFFER_TYPES[Math.round(Math.random() * 3)]};
   offer.location = {
-    x: Math.round(Math.random() * (630 - 130) + 130),
+    x: Math.round(Math.random() * mapWidth),
     y: Math.round(Math.random() * (630 - 130) + 130)
   };
 
