@@ -101,12 +101,63 @@ var writeInputValue = function (input, value) {
   }
 };
 
+var syncTypeAndPrice = function () {
+  var BUNGALO_MIN_PRICE = 0;
+  var FLAT_MIN_PRICE = 1000;
+  var HOUSE_MIN_PRICE = 5000;
+  var PALACE_MIN_PRICE = 10000;
+
+  switch (typeOfHousing.value) {
+    case 'bungalo':
+      price.min = BUNGALO_MIN_PRICE;
+      price.placeholder = BUNGALO_MIN_PRICE;
+      break;
+    case 'flat':
+      price.min = FLAT_MIN_PRICE;
+      price.placeholder = FLAT_MIN_PRICE;
+      break;
+    case 'house':
+      price.min = HOUSE_MIN_PRICE;
+      price.placeholder = HOUSE_MIN_PRICE;
+      break;
+    case 'palace':
+      price.min = PALACE_MIN_PRICE;
+      price.placeholder = PALACE_MIN_PRICE;
+      break;
+  }
+};
+
+var syncTimeinAndTimeout = function () {
+  timeout.selectedIndex = timein.selectedIndex;
+};
+
+var syncTimeoutAndTimein = function () {
+  timein.selectedIndex = timeout.selectedIndex;
+};
+
 var offers = createOfferList(8);
 var mapPin = document.querySelector('.map__pin--main');
 var address = document.querySelector('input[name=address]');
+var typeOfHousing = document.querySelector('select[name=type]');
+var price = document.querySelector('input[name=price');
+var timein = document.querySelector('select[name=timein]');
+var timeout = document.querySelector('select[name=timeout]');
+
 
 enebleForm(false);
 
 mapPin.addEventListener('click', onMapPinClick);
 
 writeInputValue(address, mapPin);
+
+typeOfHousing.addEventListener('change', function () {
+  syncTypeAndPrice();
+});
+
+timein.addEventListener('change', function () {
+  syncTimeinAndTimeout();
+});
+
+timeout.addEventListener('change', function () {
+  syncTimeoutAndTimein();
+});
