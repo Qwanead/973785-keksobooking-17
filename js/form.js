@@ -2,7 +2,47 @@
 
 (function () {
 
-  var enebleForm = function (formEnabled) {
+  var createPin = function (offer) {
+    var OFFER_PIN_WIDTH = 50;
+    var OFFER_PIN_HEIGHT = 70;
+
+    var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
+    var pin = pinTemplate.cloneNode(true);
+    var img = pin.querySelector('img');
+
+    pin.style.left = (offer.location.x - OFFER_PIN_WIDTH / 2) + 'px';
+    pin.style.top = (offer.location.y - OFFER_PIN_HEIGHT) + 'px';
+    img.src = offer.author.avatar;
+    img.alt = offer.offer.title;
+
+    return pin;
+  };
+
+  var renderPins = function (offers) {
+    var fragment = document.createDocumentFragment();
+    for (var i = 0; i < offers.length; i++) {
+      fragment.appendChild(createPin(offers[i]));
+    }
+
+    return fragment;
+  };
+
+  var onLoad = function (offers) {
+    document.querySelector('.map__pins').appendChild(renderPins(offers));
+  };
+
+  var onError = function (response) {
+    var errorTemplate =
+      document.querySelector('#error')
+      .content.querySelector('.error');
+    var errorBlock = errorTemplate.cloneNode(true);
+    var errorMessage = errorBlock.querySelector('.error__message');
+
+    errorMessage.textContent = response;
+    document.querySelector('body').appendChild(errorBlock);
+  };
+
+  var enableForm = function (formEnabled) {
     var fildsets = document.querySelectorAll('fieldset');
     var selects = document.querySelectorAll('select');
 
@@ -18,7 +58,7 @@
       document.querySelector('.map').classList.remove('map--faded');
       document.querySelector('.ad-form').classList.remove('ad-form--disabled');
 
-      document.querySelector('.map__pins').appendChild(window.data.renderPins(offers));
+      window.backend.load(onLoad, onError);
     }
   };
 
@@ -48,7 +88,6 @@
     }
   };
 
-  var offers = window.data.createOfferList(8);
   var timein = document.querySelector('select[name=timein]');
   var timeout = document.querySelector('select[name=timeout]');
   var typeOfHousing = document.querySelector('select[name=type]');
@@ -75,6 +114,6 @@
   });
 
   window.form = {
-    enebleForm: enebleForm
+    enable: enableForm
   };
 })();
