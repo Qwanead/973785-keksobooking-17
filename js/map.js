@@ -1,10 +1,18 @@
 'use strict';
 
 (function () {
+
+  var MAP_HEIGHT = 630;
+  var MAP_PADDING_TOP = 130;
+  var MAP_PIN_WIDTH = 65;
+  var MAP_PIN_HEIGHT = 87;
+
+  var mapWidth = document.querySelector('main').offsetWidth;
+
   var getMapPinCoordinates = function (mapPin) {
     var coordinates = {};
-    coordinates.x = parseInt(mapPin.style.left, 10) + Math.round(window.data.MAP_PIN_WIDTH / 2);
-    coordinates.y = parseInt(mapPin.style.top, 10) + window.data.MAP_PIN_HEIGHT;
+    coordinates.x = parseInt(mapPin.style.left, 10) + Math.round(MAP_PIN_WIDTH / 2);
+    coordinates.y = parseInt(mapPin.style.top, 10) + MAP_PIN_HEIGHT;
 
     return coordinates;
   };
@@ -20,7 +28,7 @@
   var mapPin = document.querySelector('.map__pin--main');
   var address = document.querySelector('input[name=address]');
 
-  window.form.enebleForm(false);
+  window.form.enable(false);
 
   writeInputValue(address, mapPin);
 
@@ -29,16 +37,16 @@
   var isFormEnabled = false;
 
   var isPinCoordXOnMap = function (pin) {
-    var pinCoordX = pin.offsetLeft + Math.round(window.data.MAP_PIN_WIDTH / 2);
+    var pinCoordX = pin.offsetLeft + Math.round(MAP_PIN_WIDTH / 2);
     var result = true;
 
     if (pinCoordX < 0) {
-      pin.style.left = 0 - Math.round(window.data.MAP_PIN_WIDTH / 2) + 'px';
+      pin.style.left = 0 - Math.round(MAP_PIN_WIDTH / 2) + 'px';
       result = false;
     }
 
-    if (pinCoordX > window.data.mapWidth) {
-      pin.style.left = window.data.mapWidth - Math.round(window.data.MAP_PIN_WIDTH / 2) + 'px';
+    if (pinCoordX > mapWidth) {
+      pin.style.left = mapWidth - Math.round(MAP_PIN_WIDTH / 2) + 'px';
       result = false;
     }
 
@@ -46,16 +54,16 @@
   };
 
   var isPinCoordYOnMap = function (pin) {
-    var pinCoordY = pin.offsetTop + window.data.MAP_PIN_HEIGHT;
+    var pinCoordY = pin.offsetTop + MAP_PIN_HEIGHT;
     var result = true;
 
-    if (pinCoordY < window.data.MAP_PADDING_TOP) {
-      pin.style.top = window.data.MAP_PADDING_TOP - window.data.MAP_PIN_HEIGHT + 'px';
+    if (pinCoordY < MAP_PADDING_TOP) {
+      pin.style.top = MAP_PADDING_TOP - MAP_PIN_HEIGHT + 'px';
       result = false;
     }
 
-    if (pinCoordY > window.data.MAP_HEIGHT) {
-      pin.style.top = window.data.MAP_HEIGHT - window.data.MAP_PIN_HEIGHT + 'px';
+    if (pinCoordY > MAP_HEIGHT) {
+      pin.style.top = MAP_HEIGHT - MAP_PIN_HEIGHT + 'px';
       result = false;
     }
 
@@ -66,7 +74,7 @@
     evt.preventDefault();
 
     if (!isFormEnabled) {
-      window.form.enebleForm(true);
+      window.form.enable(true);
     }
 
     var startPinCoords = {
