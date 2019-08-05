@@ -75,6 +75,7 @@
 
     if (!isFormEnabled) {
       window.form.enable(true);
+      isFormEnabled = true;
     }
 
     var startPinCoords = {

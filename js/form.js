@@ -1,10 +1,15 @@
 'use strict';
 
 (function () {
+  var loadedOffers;
 
   var createPin = function (offer) {
     var OFFER_PIN_WIDTH = 50;
     var OFFER_PIN_HEIGHT = 70;
+
+    if (!offer) {
+      return undefined;
+    }
 
     var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
     var pin = pinTemplate.cloneNode(true);
@@ -18,17 +23,38 @@
     return pin;
   };
 
-  var renderPins = function (offers) {
-    var fragment = document.createDocumentFragment();
-    for (var i = 0; i < offers.length; i++) {
-      fragment.appendChild(createPin(offers[i]));
+  var removePins = function () {
+    var pins = document.querySelector('.map__offers');
+
+    if (pins) {
+      pins.parentNode.removeChild(pins);
     }
+  };
+
+  var renderPins = function (offers) {
+    var NUM_OF_PINS = 5;
+
+    if (offers.length === 0) {
+      return undefined;
+    }
+
+    var fragment = document.createDocumentFragment();
+    var div = document.createElement('div');
+    div.className = 'map__offers';
+    fragment.appendChild(div);
+
+    offers.slice(0, NUM_OF_PINS).forEach(function (pin) {
+      if (pin.offer) {
+        div.appendChild(createPin(pin));
+      }
+    });
 
     return fragment;
   };
 
   var onLoad = function (offers) {
-    document.querySelector('.map__pins').appendChild(renderPins(offers));
+    loadedOffers = offers;
+    document.querySelector('.map__pins').appendChild(renderPins(loadedOffers));
   };
 
   var onError = function (response) {
@@ -111,6 +137,47 @@
 
   timeout.addEventListener('change', function () {
     syncTimeoutAndTimein();
+  });
+
+  var updatePins = function () {
+    var resultPins = loadedOffers;
+
+    removePins();
+
+    if (loadedOffers) {
+      switch (housingType.value) {
+        case 'palace':
+          resultPins = loadedOffers.filter(function (pins) {
+            return pins.offer.type === 'palace';
+          });
+          break;
+        case 'flat':
+          resultPins = loadedOffers.filter(function (pins) {
+            return pins.offer.type === 'flat';
+          });
+          break;
+        case 'house':
+          resultPins = loadedOffers.filter(function (pins) {
+            return pins.offer.type === 'house';
+          });
+          break;
+        case 'bungalo':
+          resultPins = loadedOffers.filter(function (pins) {
+            return pins.offer.type === 'bungalo';
+          });
+          break;
+      }
+
+      if (resultPins.length > 0) {
+        document.querySelector('.map__pins').appendChild(renderPins(resultPins));
+      }
+    }
+  };
+
+  var housingType = document.querySelector('select[name=housing-type]');
+
+  housingType.addEventListener('change', function () {
+    updatePins();
   });
 
   window.form = {
