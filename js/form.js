@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var ESC_KEYCODE = 27;
+
   var loadedOffers;
 
   var createPin = function (offer) {
@@ -34,8 +36,6 @@
   };
 
   var onCardEscPress = function (evt) {
-    var ESC_KEYCODE = 27;
-
     if (evt.keyCode === ESC_KEYCODE) {
       evt.preventDefault();
       removeCard();
@@ -186,18 +186,99 @@
     addHandlersOnPins(pins);
   };
 
+  var resetPage = function () {
+    enableForm(false);
+    removePins();
+    resetMapPin();
+    window.form.isEnabled = false;
+  };
+
+  var resetMapPin = function () {
+    var MAP_PIN_INITIAL_COORD_X = 570;
+    var MAP_PIN_INITIAL_COORD_Y = 375;
+    var INITIAL_ADDRESS_VALUE = '603, 462';
+
+    var mapPin = document.querySelector('.map__pin--main');
+    var address = document.querySelector('input[name=address]');
+
+    address.value = INITIAL_ADDRESS_VALUE;
+
+    mapPin.style.left = MAP_PIN_INITIAL_COORD_X + 'px';
+    mapPin.style.top = MAP_PIN_INITIAL_COORD_Y + 'px';
+  };
+
+  var removeMessage = function () {
+    var message = document.querySelector('.success');
+
+    message.parentNode.removeChild(message);
+
+    document.removeEventListener('click', onMessageClick);
+    document.removeEventListener('keydown', onMessageEscPress);
+  };
+
+  var onMessageClick = function () {
+    removeMessage();
+  };
+
+  var onMessageEscPress = function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      evt.preventDefault();
+      removeMessage();
+    }
+  };
+
+  var showSuccessMessage = function () {
+    var messageTemplate = document.querySelector('#success').content.querySelector('.success');
+    var message = messageTemplate.cloneNode(true);
+
+    document.querySelector('body').appendChild(message);
+
+    document.addEventListener('click', onMessageClick);
+    document.addEventListener('keydown', onMessageEscPress);
+  };
+
+  var onSave = function () {
+    resetPage();
+    showSuccessMessage();
+  };
+
+  var removeErrorMessage = function () {
+    var error = document.querySelector('.error');
+
+    error.parentNode.removeChild(error);
+
+    document.removeEventListener('keydown', onErrorEscPress);
+  };
+
+  var onErrorClick = function () {
+    removeErrorMessage();
+  };
+
+  var onErrorEscPress = function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      evt.preventDefault();
+      removeErrorMessage();
+    }
+  };
+
   var onError = function (response) {
-    var errorTemplate =
-      document.querySelector('#error')
-      .content.querySelector('.error');
+    var errorTemplate = document.querySelector('#error').content.querySelector('.error');
     var errorBlock = errorTemplate.cloneNode(true);
     var errorMessage = errorBlock.querySelector('.error__message');
 
     errorMessage.textContent = response;
     document.querySelector('body').appendChild(errorBlock);
+
+    var closeErrorButton = document.querySelector('.error__button');
+
+    closeErrorButton.addEventListener('click', onErrorClick);
+    document.addEventListener('keydown', onErrorEscPress);
   };
 
+  var isFormEnabled = false;
+
   var enableForm = function (formEnabled) {
+    var form = document.querySelector('.ad-form');
     var fildsets = document.querySelectorAll('fieldset');
     var selects = document.querySelectorAll('select');
 
@@ -211,9 +292,13 @@
 
     if (formEnabled) {
       document.querySelector('.map').classList.remove('map--faded');
-      document.querySelector('.ad-form').classList.remove('ad-form--disabled');
+      form.classList.remove('ad-form--disabled');
 
       window.backend.load(onLoad, onError);
+    } else {
+      document.querySelector('.map').classList.add('map--faded');
+      form.reset();
+      form.classList.add('ad-form--disabled');
     }
   };
 
@@ -359,7 +444,22 @@
     updatePins();
   });
 
+  var form = document.querySelector('.ad-form');
+
+  form.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.backend.save(new FormData(form), onSave, onError);
+  });
+
+  var resetButton = form.querySelector('.ad-form__reset');
+
+  resetButton.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    resetPage();
+  });
+
   window.form = {
-    enable: enableForm
+    enable: enableForm,
+    isEnabled: isFormEnabled
   };
 })();
