@@ -32,10 +32,6 @@
 
   writeInputValue(address, mapPin);
 
-  // перемещение mapPin
-
-  var isFormEnabled = false;
-
   var isPinCoordXOnMap = function (pin) {
     var pinCoordX = pin.offsetLeft + Math.round(MAP_PIN_WIDTH / 2);
     var result = true;
@@ -70,12 +66,12 @@
     return result;
   };
 
-  mapPin.addEventListener('mousedown', function (evt) {
+  var onMapPinClick = function (evt) {
     evt.preventDefault();
 
-    if (!isFormEnabled) {
+    if (!window.form.isEnabled) {
       window.form.enable(true);
-      isFormEnabled = true;
+      window.form.isEnabled = true;
     }
 
     var startPinCoords = {
@@ -116,5 +112,21 @@
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+  };
+
+  mapPin.addEventListener('mousedown', function (evt) {
+    onMapPinClick(evt);
+  });
+
+  mapPin.addEventListener('keydown', function (evt) {
+    var ENTER_KEY_CODE = 13;
+    var SPACE_KEY_CODE = 32;
+
+    if ((document.activeElement === mapPin) && (evt.keyCode === ENTER_KEY_CODE) || (evt.keyCode === SPACE_KEY_CODE)) {
+      if (!window.form.isEnabled) {
+        window.form.enable(true);
+        window.form.isEnabled = true;
+      }
+    }
   });
 })();
