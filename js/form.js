@@ -15,6 +15,9 @@
     var pin = pinTemplate.cloneNode(true);
     var img = pin.querySelector('img');
 
+    pin.data = offer;
+    pin.classList.add('map__pin--offer');
+
     pin.style.left = (offer.location.x - OFFER_PIN_WIDTH / 2) + 'px';
     pin.style.top = (offer.location.y - OFFER_PIN_HEIGHT) + 'px';
     img.src = offer.author.avatar;
@@ -23,8 +26,30 @@
     return pin;
   };
 
+  var removeCard = function () {
+    var card = document.querySelector('.map__card');
+    card.parentNode.removeChild(card);
+
+    document.removeEventListener('keydown', onCardEscPress);
+  };
+
+  var onCardEscPress = function (evt) {
+    var ESC_KEYCODE = 27;
+
+    if (evt.keyCode === ESC_KEYCODE) {
+      evt.preventDefault();
+      removeCard();
+    }
+  };
+
   var renderCard = function (pin) {
-    var card = document.querySelector('#card').content.querySelector('.map__card');
+    var renderedCard = document.querySelector('.map__card');
+    if (renderedCard) {
+      removeCard();
+    }
+
+    var cardTemplete = document.querySelector('#card').content.querySelector('.map__card');
+    var card = cardTemplete.cloneNode(true);
     var avatar = card.querySelector('.popup__avatar');
     var title = card.querySelector('.popup__title');
     var address = card.querySelector('.popup__text--address');
@@ -106,6 +131,13 @@
     });
 
     document.querySelector('.map__filters-container').insertAdjacentElement('beforebegin', card);
+
+    var closeButton = document.querySelector('.popup__close');
+    closeButton.addEventListener('click', function () {
+      removeCard();
+    });
+
+    document.addEventListener('keydown', onCardEscPress);
   };
 
   var removePins = function () {
@@ -137,10 +169,21 @@
     return fragment;
   };
 
+  var addHandlersOnPins = function (pins) {
+    pins.forEach(function (pin) {
+      pin.addEventListener('click', function () {
+        renderCard(pin.data);
+      });
+    });
+  };
+
   var onLoad = function (offers) {
     loadedOffers = offers;
+
     document.querySelector('.map__pins').appendChild(renderPins(loadedOffers));
-    renderCard(offers[0]);
+
+    var pins = document.querySelectorAll('.map__pin--offer');
+    addHandlersOnPins(pins);
   };
 
   var onError = function (response) {
@@ -230,6 +273,11 @@
 
     removePins();
 
+    var renderedCard = document.querySelector('.map__card');
+    if (renderedCard) {
+      removeCard();
+    }
+
     if (loadedOffers) {
       switch (housingType.value) {
         case 'palace':
@@ -256,6 +304,9 @@
 
       if (resultPins.length > 0) {
         document.querySelector('.map__pins').appendChild(renderPins(resultPins));
+
+        var pins = document.querySelectorAll('.map__pin--offer');
+        addHandlersOnPins(pins);
       }
     }
   };
