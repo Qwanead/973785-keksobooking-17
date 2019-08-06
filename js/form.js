@@ -268,6 +268,48 @@
     syncTimeoutAndTimein();
   });
 
+  var disableOptions = function (numsOfOptions) {
+    Array.from(capacity.options).forEach(function (option, index) {
+      if (numsOfOptions.indexOf(index) !== -1) {
+        option.disabled = true;
+      } else {
+        option.disabled = false;
+      }
+    });
+  };
+
+  var selectOption = function (numOfOption) {
+    capacity.options[numOfOption].selected = true;
+  };
+
+  var syncRoomAndCapacity = function () {
+    switch (roomsSelect.value) {
+      case '1':
+        disableOptions([0, 1, 3]);
+        selectOption(2);
+        break;
+      case '2':
+        disableOptions([0, 3]);
+        selectOption(1);
+        break;
+      case '3':
+        disableOptions([3]);
+        selectOption(0);
+        break;
+      case '100':
+        disableOptions([0, 1, 2]);
+        selectOption(3);
+        break;
+    }
+  };
+
+  var roomsSelect = document.querySelector('select[name=rooms]');
+  var capacity = document.querySelector('select[name=capacity]');
+
+  roomsSelect.addEventListener('change', function () {
+    syncRoomAndCapacity();
+  });
+
   var updatePins = function () {
     var resultPins = loadedOffers;
 
