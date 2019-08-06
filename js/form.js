@@ -2,10 +2,10 @@
 
 (function () {
   var ESC_KEYCODE = 27;
-  var DEBOUNCE_INTERVAL = 500;
 
   var lastTimeout;
   var debounce = function (cb) {
+    var DEBOUNCE_INTERVAL = 500;
     if (lastTimeout) {
       window.clearTimeout(lastTimeout);
     }
@@ -39,7 +39,11 @@
 
   var removeCard = function () {
     var card = document.querySelector('.map__card');
-    card.parentNode.removeChild(card);
+
+    if (card) {
+      card.pin.classList.remove('map__pin--active');
+      card.parentNode.removeChild(card);
+    }
 
     document.removeEventListener('keydown', onCardEscPress);
   };
@@ -52,10 +56,7 @@
   };
 
   var renderCard = function (pin) {
-    var renderedCard = document.querySelector('.map__card');
-    if (renderedCard) {
-      removeCard();
-    }
+    removeCard();
 
     var cardTemplete = document.querySelector('#card').content.querySelector('.map__card');
     var card = cardTemplete.cloneNode(true);
@@ -68,14 +69,16 @@
     var time = card.querySelector('.popup__text--time');
     var description = card.querySelector('.popup__description');
 
-    avatar.src = pin.author.avatar;
-    title.textContent = pin.offer.title;
-    address.textContent = pin.offer.address;
-    price.textContent = pin.offer.price + '\u20bd' + '/ночь';
-    description.textContent = pin.offer.description;
+    card.pin = pin;
+
+    avatar.src = pin.data.author.avatar;
+    title.textContent = pin.data.offer.title;
+    address.textContent = pin.data.offer.address;
+    price.textContent = pin.data.offer.price + '\u20bd' + '/ночь';
+    description.textContent = pin.data.offer.description;
 
 
-    switch (pin.offer.type) {
+    switch (pin.data.offer.type) {
       case 'flat':
         type.textContent = 'Квартира';
         break;
@@ -90,8 +93,8 @@
         break;
     }
 
-    capacity.textContent = pin.offer.rooms + ' комнаты для ' + pin.offer.guests + ' гостей';
-    time.textContent = 'Заезд после ' + pin.offer.checkin + ', выезд до ' + pin.offer.checkout;
+    capacity.textContent = pin.data.offer.rooms + ' комнаты для ' + pin.data.offer.guests + ' гостей';
+    time.textContent = 'Заезд после ' + pin.data.offer.checkin + ', выезд до ' + pin.data.offer.checkout;
 
     var featuresList = card.querySelector('.popup__features');
     var wifi = featuresList.querySelector('.popup__feature--wifi');
@@ -105,7 +108,7 @@
       featuresList.removeChild(featuresList.lastChild);
     }
 
-    pin.offer.features.forEach(function (feature) {
+    pin.data.offer.features.forEach(function (feature) {
       switch (feature) {
         case 'wifi':
           featuresList.appendChild(wifi);
@@ -133,7 +136,7 @@
 
     photosList.removeChild(photo);
 
-    pin.offer.photos.forEach(function (srcPhoto) {
+    pin.data.offer.photos.forEach(function (srcPhoto) {
       var insertedPhoto = photo.cloneNode();
       insertedPhoto.src = srcPhoto;
       photosList.appendChild(insertedPhoto);
@@ -181,7 +184,8 @@
   var addHandlersOnPins = function (pins) {
     pins.forEach(function (pin) {
       pin.addEventListener('click', function () {
-        renderCard(pin.data);
+        pin.classList.add('map__pin--active');
+        renderCard(pin);
       });
     });
   };
@@ -196,6 +200,7 @@
   };
 
   var resetPage = function () {
+    removeCard();
     enableForm(false);
     removePins();
     resetMapPin();
@@ -408,11 +413,7 @@
     var resultPins = loadedOffers;
 
     removePins();
-
-    var renderedCard = document.querySelector('.map__card');
-    if (renderedCard) {
-      removeCard();
-    }
+    removeCard();
 
     if (resultPins) {
       var housingType = document.querySelector('select[name=housing-type]');
