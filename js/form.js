@@ -58,8 +58,8 @@
   var renderCard = function (pin) {
     removeCard();
 
-    var cardTemplete = document.querySelector('#card').content.querySelector('.map__card');
-    var card = cardTemplete.cloneNode(true);
+    var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
+    var card = cardTemplate.cloneNode(true);
     var avatar = card.querySelector('.popup__avatar');
     var title = card.querySelector('.popup__title');
     var address = card.querySelector('.popup__text--address');
@@ -205,6 +205,8 @@
     removePins();
     resetMapPin();
     window.form.isEnabled = false;
+    window.upload.resetAvatar();
+    window.upload.resetGallery();
   };
 
   var resetMapPin = function () {
@@ -369,11 +371,7 @@
 
   var disableOptions = function (numsOfOptions) {
     Array.from(capacity.options).forEach(function (option, index) {
-      if (numsOfOptions.indexOf(index) !== -1) {
-        option.disabled = true;
-      } else {
-        option.disabled = false;
-      }
+      option.disabled = numsOfOptions.indexOf(index) !== -1;
     });
   };
 
@@ -560,9 +558,9 @@
   var formMapFilter = document.querySelector('.map__filters');
   var filterSelectors = Array.from(formMapFilter.querySelectorAll('select'));
   var filterInputs = Array.from(formMapFilter.querySelectorAll('input'));
-  var formFiltres = filterSelectors.concat(filterInputs);
+  var formFiltrs = filterSelectors.concat(filterInputs);
 
-  formFiltres.forEach(function (filter) {
+  formFiltrs.forEach(function (filter) {
     filter.addEventListener('change', function () {
       debounce(updatePins);
     });
